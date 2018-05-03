@@ -6,7 +6,15 @@
 const express = require("express");
 const glob = require("glob").sync;
 const config = require("./config/server");
+const bodyParser = require("body-parser");
 const app = express();
+
+/**
+ * Middleware
+ */
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+require("./lib/databaseConnections");
 
 /**
  * Load Routes
