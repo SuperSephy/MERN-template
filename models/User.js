@@ -61,8 +61,8 @@ module.exports = function(mongoose) {
 
   // checking if password is valid
   UserSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
+    return bcrypt.compareSync(password, this.password);
   };
 
-  return mongoose.model("users", UserSchema);
+  return mongoose.model("Users", UserSchema);
 };
