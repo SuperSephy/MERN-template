@@ -34,3 +34,11 @@ const port = process.env.PORT || config.port;
 app.listen(process.env.PORT || config.port, () => {
   console.log(`\nServer running on port ${port} - http://localhost:5000`);
 });
+
+// If the Node process ends, close the Mongoose connection
+process.once("SIGINT", function() {
+  console.log(
+    `App terminated - closing in 3 seconds to allow graceful DB disconnects`
+  );
+  setTimeout(process.exit, 3000, 0);
+});
