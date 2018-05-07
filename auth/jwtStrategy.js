@@ -8,7 +8,7 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 // load up the user model
 let User;
 require("../lib/databaseConnections").then(dbs => {
-  User = dbs.mongo.model("Users");
+  User = dbs.mongo.model("User");
 });
 
 const opts = {};

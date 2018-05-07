@@ -64,5 +64,5 @@ module.exports = function(mongoose) {
     return bcrypt.compareSync(password, this.password);
   };
 
-  return mongoose.model("Users", UserSchema);
+  return mongoose.model("User", UserSchema);
 };

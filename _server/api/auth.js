@@ -1,5 +1,6 @@
 "use strict";
 
+const env = process.env.NODE_ENV || "local";
 const config = require("../../config").server;
 const express = require("express");
 const router = express.Router();
@@ -9,13 +10,17 @@ const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
 const _ = require("underscore");
 
-//Database
+// Load input Validation
+const validateRegisterInput = require("../../validation/auth/register");
+const validateLoginInput = require("../../validation/auth/login");
+
+//Database & User model
 let User;
 require("../../lib/databaseConnections").then(dbs => {
-  User = dbs.mongo.model("Users");
+  User = dbs.mongo.model("User");
 });
 
-// Global Veriables
+// Global Variables
 const port = process.env.PORT || config.port;
 
 // Start up info
@@ -45,23 +50,17 @@ module.exports = function(passport) {
 
     // Create
     .put((req, res) => {
-      const required = ["email", "name", "password"];
-      let missing = _.difference(required, _.keys(req.body));
+      const { errors, isValid } = validateRegisterInput(req.body);
 
-      if (missing.length)
-        return res.status(500).json({
-          status: "err",
-          err: `Missing required value: ${missing.join(", ")}`
-        });
-
-      console.log(`Looking for user with email ${req.body.email}`);
+      // Check Validation
+      if (!isValid) return res.status(400).json(errors);
 
       User.findOne({ email: req.body.email })
         .then(user => {
-          if (user)
-            return res
-              .status(400)
-              .json({ status: "err", err: "email already exists" });
+          if (user) {
+            errors.email = "Email already exists";
+            return res.status(400).json(errors);
+          }
 
           console.log("Checking for Gravatar");
           req.body.avatar = gravatar.url(req.body.email, {
@@ -75,34 +74,34 @@ module.exports = function(passport) {
           newUser
             .save()
             .then(user => res.json(user))
-            .catch(err => res.status(500).json({ status: "err", err }));
+            .catch(err => res.status(500).json(err));
         })
         .catch(err => {
           console.log("User look up error", err);
-          res.status(500).json({ status: "err", err });
+          res.status(500).json(err);
         });
     })
 
     // Read
     .post((req, res) => {
-      const email = req.body.email;
-      const password = req.body.password;
+      const { errors, isValid } = validateLoginInput(req.body);
 
-      if (!email)
-        return res.status(400).json({ status: "err", err: "Missing email" });
-      if (!password)
-        return res.status(400).json({ status: "err", err: "Missing password" });
+      // Check Validation
+      if (!isValid) {
+        return res.status(400).json(errors);
+      }
 
-      User.findOne({ email })
+      User.findOne({ email: req.body.email })
         .then(user => {
-          if (_.isEmpty(user))
-            return res
-              .status(404)
-              .json({ status: "err", err: "User not found" });
-          if (!user.validPassword(password))
-            return res
-              .status(400)
-              .json({ status: "err", err: "Invalid password" });
+          if (_.isEmpty(user)) {
+            errors.email = "User not found";
+            return res.status(404).json(errors);
+          }
+
+          if (!user.validPassword(req.body.password)) {
+            errors.password = "Invalid password";
+            return res.status(400).json(errors);
+          }
 
           // User Matched - Sign Token
           const token = _.pick(user, "id", "name", "avatar");
@@ -117,7 +116,8 @@ module.exports = function(passport) {
           );
         })
         .catch(err => {
-          res.status(404).json({ status: "err", err: "User not found" });
+          errors.email = "User not found";
+          res.status(404).json(errors);
         });
     })
 
@@ -126,10 +126,12 @@ module.exports = function(passport) {
       res.json({ status: "ok" });
     })
 
-    // Get current
-    // @access
+    /**
+     * @route   GET /api/auth/user
+     * @access  Private
+     */
     .get(passport.authenticate("jwt", { session: false }), (req, res) => {
-      res.json({ status: "ok", user: req.user });
+      res.json({ status: "ok", user: _.omit(req.user.toObject(), "password") });
     })
 
     // Delete

@@ -6,7 +6,7 @@ const _ = require("underscore");
 // load up the user model
 let User;
 require("../lib/databaseConnections").then(dbs => {
-  User = dbs.mongo.model("Users");
+  User = dbs.mongo.model("User");
 });
 
 // expose this function to our app using module.exports
@@ -47,21 +47,6 @@ module.exports = function(passport) {
   };
 
   require("./jwtStrategy")(passport);
-  // =========================================================================
-  // LOCAL SIGN UP ===========================================================
-  // =========================================================================
-  // we are using named strategies since we have one for login and one for signup
-  // by default, if there was no name, it would just be called 'local'
-
-  //   passport.use("local-signUp", localStrategy["local-signUp"]);
-
-  // =========================================================================
-  // LOCAL LOGIN =============================================================
-  // =========================================================================
-  // we are using named strategies since we have one for login and one for signUp
-  // by default, if there was no name, it would just be called 'local'
-
-  //   passport.use("local-login", localStrategy["local-login"]);
 
   // =========================================================================
   // FACEBOOK SIGN UP / LOGIN ================================================
