@@ -62,14 +62,12 @@ module.exports = function(passport) {
             return res.status(400).json(errors);
           }
 
-          console.log("Checking for Gravatar");
           req.body.avatar = gravatar.url(req.body.email, {
             s: "200", // Size
             r: "pg", // Rating
             d: "mm" // Default
           });
-          const newUser = new User(req.body);
-          console.log("new user", newUser);
+          const newUser = new User(_.pick(req.body, "name", "email", "password", "avatar"));
 
           newUser
             .save()
@@ -91,7 +89,9 @@ module.exports = function(passport) {
         return res.status(400).json(errors);
       }
 
-      User.findOne({ email: req.body.email })
+      User.findOne({
+        email: req.body.email
+      })
         .then(user => {
           if (_.isEmpty(user)) {
             errors.email = "User not found";
@@ -109,9 +109,14 @@ module.exports = function(passport) {
           jwt.sign(
             token,
             config.secret,
-            { expiresIn: 60 * 60 * 24 },
+            {
+              expiresIn: env === "local" ? null : "1d"
+            },
             (err, token) => {
-              res.json({ status: "ok", token: `Bearer ${token}` });
+              res.json({
+                status: "ok",
+                token: `Bearer ${token}`
+              });
             }
           );
         })
@@ -123,20 +128,32 @@ module.exports = function(passport) {
 
     // Update
     .patch((req, res) => {
-      res.json({ status: "ok" });
+      res.json({
+        status: "ok"
+      });
     })
 
     /**
      * @route   GET /api/auth/user
      * @access  Private
      */
-    .get(passport.authenticate("jwt", { session: false }), (req, res) => {
-      res.json({ status: "ok", user: _.omit(req.user.toObject(), "password") });
-    })
+    .get(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        res.json({
+          status: "ok",
+          user: _.omit(req.user.toObject(), "password")
+        });
+      }
+    )
 
     // Delete
     .delete((req, res) => {
-      res.json({ status: "ok" });
+      res.json({
+        status: "ok"
+      });
     });
 
   return router;

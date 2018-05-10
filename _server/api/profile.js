@@ -29,10 +29,10 @@ require("../../lib/databaseConnections").then(dbs => {
 });
 
 // Start up info
-console.log("-- AUTH --");
+console.log("-- PROFILE --");
 console.log(`  http://localhost:${port}/api/posts/ping`);
 
-module.exports = function(passport) {
+module.exports = function (passport) {
   /**
    * @route   GET /api/auth/ping
    * @desc    Test posts route
@@ -53,28 +53,39 @@ module.exports = function(passport) {
     })
 
     // Create Profile
-    .put(passport.authenticate("jwt", { session: false }), (req, res) => {
-      const { errors, isValid } = validateProfileInput(req.body);
+    .put(passport.authenticate("jwt", {
+      session: false
+    }), (req, res) => {
+      const {
+        errors,
+        isValid
+      } = validateProfileInput(req.body);
 
       // Check Validation
       if (!isValid) return res.status(400).json(errors);
 
       let profileFields = formatProfile(req);
 
-      Profile.findOne({ user: req.user.id }).then(currentProfile => {
+      Profile.findOne({
+        user: req.user.id
+      }).then(currentProfile => {
         // Create
-        Profile.findOne({ handle: profileFields.handle }).then(handleCheckProfile => {
+        Profile.findOne({
+          handle: profileFields.handle
+        }).then(handleCheckProfile => {
           // If profile with that handle already exists AND belongs to the current user => Update
           if (
             handleCheckProfile &&
             currentProfile &&
             handleCheckProfile.user.equals(currentProfile.user)
           ) {
-            return Profile.findOneAndUpdate(
-              { user: req.user.id },
-              { $set: profileFields },
-              { new: true }
-            ).then(updated_profile => res.json(updated_profile));
+            return Profile.findOneAndUpdate({
+              user: req.user.id
+            }, {
+              $set: profileFields
+            }, {
+              new: true
+            }).then(updated_profile => res.json(updated_profile));
           }
 
           // If profile with that handle already exists => return error
@@ -90,21 +101,33 @@ module.exports = function(passport) {
     })
 
     // ???
-    .post(passport.authenticate("jwt", { session: false }), (req, res) => {
+    .post(passport.authenticate("jwt", {
+      session: false
+    }), (req, res) => {
       let profileFields = formatProfile(req);
-      res.json({ status: "ok" });
+      res.json({
+        status: "ok"
+      });
     })
 
     // Update
-    .patch(passport.authenticate("jwt", { session: false }), (req, res) => {
-      res.json({ status: "ok" });
+    .patch(passport.authenticate("jwt", {
+      session: false
+    }), (req, res) => {
+      res.json({
+        status: "ok"
+      });
     })
 
     // Retrieve
-    .get(passport.authenticate("jwt", { session: false }), (req, res) => {
+    .get(passport.authenticate("jwt", {
+      session: false
+    }), (req, res) => {
       let errors = {};
 
-      Profile.findOne({ user: req.user.id })
+      Profile.findOne({
+          user: req.user.id
+        })
         .populate("user", ["name", "avatar"]) // Get referenced data
         .then(profile => {
           if (!profile) {
@@ -119,10 +142,18 @@ module.exports = function(passport) {
     })
 
     // Delete user AND profile
-    .delete(passport.authenticate("jwt", { session: false }), (req, res) => {
-      Profile.findOneAndRemove({ user: req.user.id }).then(() => {
-        User.findOneAndRemove({ _id: req.user.id }).then(() => {
-          res.json({ success: true });
+    .delete(passport.authenticate("jwt", {
+      session: false
+    }), (req, res) => {
+      Profile.findOneAndRemove({
+        user: req.user.id
+      }).then(() => {
+        User.findOneAndRemove({
+          _id: req.user.id
+        }).then(() => {
+          res.json({
+            success: true
+          });
         });
       });
     });
@@ -146,7 +177,9 @@ module.exports = function(passport) {
       })
       .catch(error => {
         console.error(`/api/profile/all error`, error.message);
-        return res.status(404).json({ noprofile: "There are no profiles" });
+        return res.status(404).json({
+          noprofile: "There are no profiles"
+        });
       });
   });
 
@@ -157,7 +190,9 @@ module.exports = function(passport) {
    */
 
   router.get("/handle/:handle", (req, res) => {
-    Profile.findOne({ handle: req.params.handle })
+    Profile.findOne({
+        handle: req.params.handle
+      })
       .then(profile => {
         const errors = {};
 
@@ -170,7 +205,9 @@ module.exports = function(passport) {
       })
       .catch(error => {
         console.error(`/api/profile/handle/${req.params.handle} error`, error.message);
-        return res.status(404).json({ noprofile: "Invalid user handle passed" });
+        return res.status(404).json({
+          noprofile: "Invalid user handle passed"
+        });
       });
   });
 
@@ -194,7 +231,9 @@ module.exports = function(passport) {
       })
       .catch(error => {
         console.error(`/api/profile/user/${req.params.user_id} error`, error.message);
-        return res.status(404).json({ noprofile: "Invalid user id passed" });
+        return res.status(404).json({
+          noprofile: "Invalid user id passed"
+        });
       });
   });
 
@@ -203,16 +242,25 @@ module.exports = function(passport) {
    * @desc    Add experience to profile
    * @access  Private
    */
-  router.put("/experience", passport.authenticate("jwt", { session: false }), addExperience);
-  router.post("/experience", passport.authenticate("jwt", { session: false }), addExperience);
+  router.put("/experience", passport.authenticate("jwt", {
+    session: false
+  }), addExperience);
+  router.post("/experience", passport.authenticate("jwt", {
+    session: false
+  }), addExperience);
 
   function addExperience(req, res) {
-    const { errors, isValid } = validateExperienceInput(req.body);
+    const {
+      errors,
+      isValid
+    } = validateExperienceInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
 
-    Profile.findOne({ user: req.user.id }).then(profile => {
+    Profile.findOne({
+      user: req.user.id
+    }).then(profile => {
       // Add to experience array
       // req.body keys = title, company, location, from, to, current, description
       profile.experience.unshift(
@@ -229,11 +277,15 @@ module.exports = function(passport) {
    */
   router.delete(
     "/experience/:exp_id",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     (req, res) => {
       const errors = {};
 
-      Profile.findOne({ user: req.user.id })
+      Profile.findOne({
+          user: req.user.id
+        })
         .then(profile => {
           let matchingExperience = !_.find(profile.experience, experience => {
             return experience._id.equals(ObjectId(req.params.exp_id));
@@ -245,12 +297,16 @@ module.exports = function(passport) {
           }
 
           // Remove element from array
-          profile.experience.pull({ _id: req.params.exp_id });
+          profile.experience.pull({
+            _id: req.params.exp_id
+          });
           profile.save().then(profile => res.json(profile));
         })
         .catch(error => {
           console.error(`/api/profile/experience/${req.params.exp_id} error`, error);
-          res.status(404).json({ education: "No matching experience entry found" });
+          res.status(404).json({
+            education: "No matching experience entry found"
+          });
         });
     }
   );
@@ -260,16 +316,25 @@ module.exports = function(passport) {
    * @desc    Add education to profile
    * @access  Private
    */
-  router.put("/education", passport.authenticate("jwt", { session: false }), addEducation);
-  router.post("/education", passport.authenticate("jwt", { session: false }), addEducation);
+  router.put("/education", passport.authenticate("jwt", {
+    session: false
+  }), addEducation);
+  router.post("/education", passport.authenticate("jwt", {
+    session: false
+  }), addEducation);
 
   function addEducation(req, res) {
-    const { errors, isValid } = validateEducationInput(req.body);
+    const {
+      errors,
+      isValid
+    } = validateEducationInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
 
-    Profile.findOne({ user: req.user.id }).then(profile => {
+    Profile.findOne({
+      user: req.user.id
+    }).then(profile => {
       // Add to experience array
       // req.body keys = title, company, location, from, to, current, description
       profile.education.unshift(
@@ -286,11 +351,15 @@ module.exports = function(passport) {
    */
   router.delete(
     "/education/:edu_id",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     (req, res) => {
       const errors = {};
 
-      Profile.findOne({ user: req.user.id })
+      Profile.findOne({
+          user: req.user.id
+        })
         .then(profile => {
           let matchingEducation = !_.find(profile.education, education => {
             return education._id.equals(ObjectId(req.params.edu_id));
@@ -302,12 +371,16 @@ module.exports = function(passport) {
           }
 
           // Remove element from array
-          profile.education.pull({ _id: req.params.edu_id });
+          profile.education.pull({
+            _id: req.params.edu_id
+          });
           profile.save().then(profile => res.json(profile));
         })
         .catch(error => {
           console.error(`/api/profile/education/${req.params.edu_id} error`, error);
-          res.status(404).json({ education: "No matching education entry found" });
+          res.status(404).json({
+            education: "No matching education entry found"
+          });
         });
     }
   );

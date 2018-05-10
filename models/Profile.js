@@ -1,5 +1,3 @@
-const bcrypt = require("bcryptjs");
-
 module.exports = function(mongoose) {
   const Schema = mongoose.Schema;
 
