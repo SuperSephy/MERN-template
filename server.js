@@ -40,9 +40,11 @@ app.listen(process.env.PORT || config.port, () => {
 });
 
 // If the Node process ends, close the Mongoose connection
-process.once("SIGINT", function() {
-  console.log(
-    `App terminated - closing in 3 seconds to allow graceful DB disconnects`
-  );
-  setTimeout(process.exit, 3000, 0);
-});
+process.once("SIGINT", graceful_shutdown);
+process.once("SIGUSR2", graceful_shutdown);
+process.once("SIGTERM", graceful_shutdown);
+
+function graceful_shutdown(sig) {
+  console.log(`App terminated by ${sig}`);
+  process.exit(0);
+}
