@@ -1,8 +1,17 @@
 import React, { Component } from "react";
-import axios from "axios";
-import classnames from "classnames";
+import { withRouter } from "react-router-dom";
 
-export default class Register extends Component {
+// Connect Redux to the component
+import { connect } from "react-redux";
+
+// Support Libraries
+import PropTypes from "prop-types"; // Runtime type checking for React props and similar objects.
+import classnames from "classnames"; // Let's us make conditional HTML class names
+
+// Actions
+import { registerUser } from "../../actions/authActions";
+
+class Register extends Component {
   constructor() {
     super();
     this.state = {
@@ -16,6 +25,11 @@ export default class Register extends Component {
     // Bind listeners
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  // Lifecycle Method - runs when component receives new properties
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) this.setState({ errors: nextProps.errors });
   }
 
   onChange(e) {
@@ -32,10 +46,8 @@ export default class Register extends Component {
       password2: this.state.password2
     };
 
-    axios
-      .put("/api/auth/user", newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({ errors: err.response.data }));
+    // Uses the Register action      Pass router to action
+    this.props.registerUser(newUser, this.props.history);
   }
 
   render() {
@@ -124,3 +136,23 @@ export default class Register extends Component {
     );
   }
 }
+
+// Enforce type casting, requirements, etc
+// ComponentName.propTypes
+Register.propTypes = {
+  errors: PropTypes.object.isRequired,
+  auth: PropTypes.object.isRequired,
+  registerUser: PropTypes.func.isRequired
+};
+
+// Send State to Component
+const mapStateToProps = state => ({
+  errors: state.errors,
+
+  // Puts auth state (from root reducer reducers/index.js) in property called auth
+  // accessible as this.props.auth
+  auth: state.auth
+});
+
+//             Connect Redux            Map Actions
+export default connect(mapStateToProps, { registerUser })(withRouter(Register));
