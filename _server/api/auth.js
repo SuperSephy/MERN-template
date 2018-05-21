@@ -11,12 +11,12 @@ const jwt = require("jsonwebtoken");
 const _ = require("underscore");
 
 // Load input Validation
-const validateRegisterInput = require("../../validation/auth/register");
-const validateLoginInput = require("../../validation/auth/login");
+const validateRegisterInput = require("../validation/auth/register");
+const validateLoginInput = require("../validation/auth/login");
 
 //Database & User model
 let User;
-require("../../lib/databaseConnections").then(dbs => {
+require("../dbs/databaseConnections").then(dbs => {
   User = dbs.mongo.model("User");
 });
 
@@ -50,12 +50,12 @@ module.exports = function(passport) {
 
     // Create
     .put((req, res) => {
-      const { errors, isValid } = validateRegisterInput(req.body);
+      const {errors, isValid} = validateRegisterInput(req.body);
 
       // Check Validation
       if (!isValid) return res.status(400).json(errors);
 
-      User.findOne({ email: req.body.email })
+      User.findOne({email: req.body.email})
         .then(user => {
           if (user) {
             errors.email = "Email already exists";
@@ -82,7 +82,7 @@ module.exports = function(passport) {
 
     // Read
     .post((req, res) => {
-      const { errors, isValid } = validateLoginInput(req.body);
+      const {errors, isValid} = validateLoginInput(req.body);
 
       // Check Validation
       if (!isValid) {

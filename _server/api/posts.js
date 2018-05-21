@@ -8,7 +8,7 @@ const router = express.Router();
 const _ = require("underscore");
 
 // Load input Validation
-const validatePostInput = require("../../validation/post");
+const validatePostInput = require("../validation/post");
 
 // Global Variables
 const port = process.env.PORT || config.port;
@@ -17,7 +17,7 @@ const port = process.env.PORT || config.port;
 let User;
 let Post;
 let Profile;
-require("../../lib/databaseConnections").then(dbs => {
+require("../dbs/databaseConnections").then(dbs => {
   User = dbs.mongo.model("User");
   Post = dbs.mongo.model("Post");
   Profile = dbs.mongo.model("Profile");
@@ -48,8 +48,8 @@ module.exports = function(passport) {
     })
 
     // Create new post
-    .put(passport.authenticate("jwt", { session: false }), (req, res) => {
-      const { errors, isValid } = validatePostInput(req.body);
+    .put(passport.authenticate("jwt", {session: false}), (req, res) => {
+      const {errors, isValid} = validatePostInput(req.body);
 
       // Check Validation
       if (!isValid) return res.status(400).json(errors);
@@ -65,9 +65,9 @@ module.exports = function(passport) {
     // Read ALL posts
     .get((req, res) => {
       Post.find()
-        .sort({ createdAt: -1 })
+        .sort({createdAt: -1})
         .then(posts => res.json(posts))
-        .catch(err => res.status(404).json({ posts: "No posts found" }));
+        .catch(err => res.status(404).json({posts: "No posts found"}));
     });
 
   /**
@@ -88,24 +88,24 @@ module.exports = function(passport) {
 
       Post.findById(req.params.post_id)
         .then(post => res.json(post))
-        .catch(err => res.json({ post: "No post found" }));
+        .catch(err => res.json({post: "No post found"}));
     })
 
     // Delete Post
-    .delete(passport.authenticate("jwt", { session: false }), (req, res) => {
-      Profile.findOne({ user: req.user.id })
+    .delete(passport.authenticate("jwt", {session: false}), (req, res) => {
+      Profile.findOne({user: req.user.id})
         .then(profile => {
           Post.findById(req.params.post_id)
             .then(post => {
               // Check for post owner
               if (post.user.toString() !== req.user.id)
-                return post.remove().then(() => res.json({ success: true }));
+                return post.remove().then(() => res.json({success: true}));
 
               return res.status(401).send("Unauthorized");
             })
-            .catch(err => res.status(404).json({ post: "No post found" }));
+            .catch(err => res.status(404).json({post: "No post found"}));
         })
-        .catch(err => res.status(404).json({ profile: "No profile found with that id" }));
+        .catch(err => res.status(404).json({profile: "No profile found with that id"}));
     });
 
   /**
@@ -121,12 +121,12 @@ module.exports = function(passport) {
     })
 
     // Add like to a post
-    .post(passport.authenticate("jwt", { session: false }), (req, res) => {
+    .post(passport.authenticate("jwt", {session: false}), (req, res) => {
       manageLikes(req, res, "like");
     })
 
     // Remove like from post
-    .delete(passport.authenticate("jwt", { session: false }), (req, res) => {
+    .delete(passport.authenticate("jwt", {session: false}), (req, res) => {
       manageLikes(req, res, "unlike");
     });
 
@@ -136,9 +136,9 @@ module.exports = function(passport) {
    */
   router.post(
     "/comment/:post_id/",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {session: false}),
     (req, res) => {
-      const { errors, isValid } = validatePostInput(req.body);
+      const {errors, isValid} = validatePostInput(req.body);
 
       // Check Validation
       if (!isValid) return res.status(400).json(errors);
@@ -152,7 +152,7 @@ module.exports = function(passport) {
           post.comments.unshift(newComment);
           post.save().then(post => res.json(post));
         })
-        .catch(err => res.status(404).json({ post: "No post found" }));
+        .catch(err => res.status(404).json({post: "No post found"}));
     }
   );
 
@@ -162,7 +162,7 @@ module.exports = function(passport) {
    */
   router.delete(
     "/comment/:post_id/:comment_id",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {session: false}),
     (req, res) => {
       console.log("Post id", req.params.post_id);
       console.log("Comment id", req.params.comment_id);
@@ -174,14 +174,14 @@ module.exports = function(passport) {
           });
 
           // Ensure comment exists
-          if (!foundComment) return res.status(404).json({ comment: "Comment not found" });
+          if (!foundComment) return res.status(404).json({comment: "Comment not found"});
 
-          post.comments.pull({ _id: req.params.comment_id });
+          post.comments.pull({_id: req.params.comment_id});
           post.save().then(post => res.json(post));
         })
         .catch(err => {
           console.log(err);
-          res.status(404).json({ post: "No post found" });
+          res.status(404).json({post: "No post found"});
         });
     }
   );
@@ -200,7 +200,7 @@ module.exports = function(passport) {
  * @param {string}  type  "like" || "unlike"
  */
 function manageLikes(req, res, type) {
-  Profile.findOne({ user: req.user.id })
+  Profile.findOne({user: req.user.id})
     .then(profile => {
       Post.findById(req.params.post_id)
         .then(post => {
@@ -212,23 +212,23 @@ function manageLikes(req, res, type) {
           switch (type) {
             case "like":
               if (userAlreadyLiked)
-                return res.status(400).json({ like: "You already liked this post" });
+                return res.status(400).json({like: "You already liked this post"});
 
-              post.likes.unshift({ user: req.user.id });
+              post.likes.unshift({user: req.user.id});
               return post.save().then(post => res.json(post));
 
             case "unlike":
               if (!userAlreadyLiked)
-                return res.status(400).json({ like: "You have not liked this post" });
+                return res.status(400).json({like: "You have not liked this post"});
 
-              post.likes.pull({ user: req.user.id });
+              post.likes.pull({user: req.user.id});
               return post.save().then(post => res.json(post));
 
             default:
               return res.status(500).send("Unknown Like method called");
           }
         })
-        .catch(err => res.status(404).json({ post: "No post found with that id" }));
+        .catch(err => res.status(404).json({post: "No post found with that id"}));
     })
-    .catch(err => res.status(404).json({ profile: "No profile found for this user" }));
+    .catch(err => res.status(404).json({profile: "No profile found for this user"}));
 }

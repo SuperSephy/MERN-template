@@ -1,7 +1,7 @@
 "use strict";
 
 const env = process.env.NODE_ENV || "local";
-const config = require("../config").databases;
+const config = require("../../config").databases;
 const glob = require("glob").sync;
 const _ = require("underscore");
 
@@ -12,13 +12,11 @@ module.exports = require("@impact-marketing-specialists/ims-db-connections")({
     console.log("Database connections successful: " + Object.keys(dbs).sort());
 
     // Models
-    glob("**/*.js", { cwd: "./models" }).forEach(model => {
-      require(`../models/${model}`)(dbs.mongo);
+    glob("**/*.js", {cwd: "_server/dbs/models"}).forEach(model => {
+      require(`./models/${model}`)(dbs.mongo);
     });
 
-    console.log(
-      "  Available Mongo Models: " + _.keys(dbs.mongo.models).join(", ")
-    );
+    console.log("  Available Mongo Models: " + _.keys(dbs.mongo.models).join(", "));
     return dbs;
   },
   err => {

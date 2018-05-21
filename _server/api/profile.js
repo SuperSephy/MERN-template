@@ -11,9 +11,9 @@ const router = express.Router();
 const _ = require("underscore");
 
 // Load input Validation
-const validateProfileInput = require("../../validation/profile");
-const validateExperienceInput = require("../../validation/profile/experience");
-const validateEducationInput = require("../../validation/profile/education");
+const validateProfileInput = require("../validation/profile");
+const validateExperienceInput = require("../validation/profile/experience");
+const validateEducationInput = require("../validation/profile/education");
 
 // Global Veriables
 const port = process.env.PORT || config.port;
@@ -22,7 +22,7 @@ const port = process.env.PORT || config.port;
 let User;
 let Profile;
 let ObjectId;
-require("../../lib/databaseConnections").then(dbs => {
+require("../dbs/databaseConnections").then(dbs => {
   User = dbs.mongo.model("User");
   Profile = dbs.mongo.model("Profile");
   ObjectId = dbs.mongo.Types.ObjectId;
@@ -32,7 +32,7 @@ require("../../lib/databaseConnections").then(dbs => {
 console.log("-- PROFILE --");
 console.log(`  http://localhost:${port}/api/posts/ping`);
 
-module.exports = function (passport) {
+module.exports = function(passport) {
   /**
    * @route   GET /api/auth/ping
    * @desc    Test posts route
@@ -53,110 +53,126 @@ module.exports = function (passport) {
     })
 
     // Create Profile
-    .put(passport.authenticate("jwt", {
-      session: false
-    }), (req, res) => {
-      const {
-        errors,
-        isValid
-      } = validateProfileInput(req.body);
+    .put(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        const {errors, isValid} = validateProfileInput(req.body);
 
-      // Check Validation
-      if (!isValid) return res.status(400).json(errors);
+        // Check Validation
+        if (!isValid) return res.status(400).json(errors);
 
-      let profileFields = formatProfile(req);
+        let profileFields = formatProfile(req);
 
-      Profile.findOne({
-        user: req.user.id
-      }).then(currentProfile => {
-        // Create
         Profile.findOne({
-          handle: profileFields.handle
-        }).then(handleCheckProfile => {
-          // If profile with that handle already exists AND belongs to the current user => Update
-          if (
-            handleCheckProfile &&
-            currentProfile &&
-            handleCheckProfile.user.equals(currentProfile.user)
-          ) {
-            return Profile.findOneAndUpdate({
-              user: req.user.id
-            }, {
-              $set: profileFields
-            }, {
-              new: true
-            }).then(updated_profile => res.json(updated_profile));
-          }
-
-          // If profile with that handle already exists => return error
-          if (handleCheckProfile) {
-            errors.handle = "That handle already belongs to another user";
-            return res.status(400).json(errors);
-          }
-
-          //Save
-          new Profile(profileFields).save().then(profile => res.json(profile));
-        });
-      });
-    })
-
-    // ???
-    .post(passport.authenticate("jwt", {
-      session: false
-    }), (req, res) => {
-      let profileFields = formatProfile(req);
-      res.json({
-        status: "ok"
-      });
-    })
-
-    // Update
-    .patch(passport.authenticate("jwt", {
-      session: false
-    }), (req, res) => {
-      res.json({
-        status: "ok"
-      });
-    })
-
-    // Retrieve
-    .get(passport.authenticate("jwt", {
-      session: false
-    }), (req, res) => {
-      let errors = {};
-
-      Profile.findOne({
           user: req.user.id
-        })
-        .populate("user", ["name", "avatar"]) // Get referenced data
-        .then(profile => {
-          if (!profile) {
-            errors.noprofile = "There is no profile for this user";
-            return res.status(404).json(errors);
-          }
-          res.json(profile);
-        })
-        .catch(err => {
-          res.status(404).json(err);
-        });
-    })
+        }).then(currentProfile => {
+          // Create
+          Profile.findOne({
+            handle: profileFields.handle
+          }).then(handleCheckProfile => {
+            // If profile with that handle already exists AND belongs to the current user => Update
+            if (
+              handleCheckProfile &&
+              currentProfile &&
+              handleCheckProfile.user.equals(currentProfile.user)
+            ) {
+              return Profile.findOneAndUpdate(
+                {
+                  user: req.user.id
+                },
+                {
+                  $set: profileFields
+                },
+                {
+                  new: true
+                }
+              ).then(updated_profile => res.json(updated_profile));
+            }
 
-    // Delete user AND profile
-    .delete(passport.authenticate("jwt", {
-      session: false
-    }), (req, res) => {
-      Profile.findOneAndRemove({
-        user: req.user.id
-      }).then(() => {
-        User.findOneAndRemove({
-          _id: req.user.id
-        }).then(() => {
-          res.json({
-            success: true
+            // If profile with that handle already exists => return error
+            if (handleCheckProfile) {
+              errors.handle = "That handle already belongs to another user";
+              return res.status(400).json(errors);
+            }
+
+            //Save
+            new Profile(profileFields).save().then(profile => res.json(profile));
           });
         });
-      });
-    });
+      }
+    )
+
+    // ???
+    .post(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        let profileFields = formatProfile(req);
+        res.json({
+          status: "ok"
+        });
+      }
+    )
+
+    // Update
+    .patch(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        res.json({
+          status: "ok"
+        });
+      }
+    )
+
+    // Retrieve
+    .get(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        let errors = {};
+
+        Profile.findOne({
+          user: req.user.id
+        })
+          .populate("user", ["name", "avatar"]) // Get referenced data
+          .then(profile => {
+            if (!profile) {
+              errors.noprofile = "There is no profile for this user";
+              return res.status(404).json(errors);
+            }
+            res.json(profile);
+          })
+          .catch(err => {
+            res.status(404).json(err);
+          });
+      }
+    )
+
+    // Delete user AND profile
+    .delete(
+      passport.authenticate("jwt", {
+        session: false
+      }),
+      (req, res) => {
+        Profile.findOneAndRemove({
+          user: req.user.id
+        }).then(() => {
+          User.findOneAndRemove({
+            _id: req.user.id
+          }).then(() => {
+            res.json({
+              success: true
+            });
+          });
+        });
+      }
+    );
 
   /**
    * @route   GET /api/profile/all
@@ -191,8 +207,8 @@ module.exports = function (passport) {
 
   router.get("/handle/:handle", (req, res) => {
     Profile.findOne({
-        handle: req.params.handle
-      })
+      handle: req.params.handle
+    })
       .then(profile => {
         const errors = {};
 
@@ -242,18 +258,23 @@ module.exports = function (passport) {
    * @desc    Add experience to profile
    * @access  Private
    */
-  router.put("/experience", passport.authenticate("jwt", {
-    session: false
-  }), addExperience);
-  router.post("/experience", passport.authenticate("jwt", {
-    session: false
-  }), addExperience);
+  router.put(
+    "/experience",
+    passport.authenticate("jwt", {
+      session: false
+    }),
+    addExperience
+  );
+  router.post(
+    "/experience",
+    passport.authenticate("jwt", {
+      session: false
+    }),
+    addExperience
+  );
 
   function addExperience(req, res) {
-    const {
-      errors,
-      isValid
-    } = validateExperienceInput(req.body);
+    const {errors, isValid} = validateExperienceInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
@@ -284,8 +305,8 @@ module.exports = function (passport) {
       const errors = {};
 
       Profile.findOne({
-          user: req.user.id
-        })
+        user: req.user.id
+      })
         .then(profile => {
           let matchingExperience = !_.find(profile.experience, experience => {
             return experience._id.equals(ObjectId(req.params.exp_id));
@@ -316,18 +337,23 @@ module.exports = function (passport) {
    * @desc    Add education to profile
    * @access  Private
    */
-  router.put("/education", passport.authenticate("jwt", {
-    session: false
-  }), addEducation);
-  router.post("/education", passport.authenticate("jwt", {
-    session: false
-  }), addEducation);
+  router.put(
+    "/education",
+    passport.authenticate("jwt", {
+      session: false
+    }),
+    addEducation
+  );
+  router.post(
+    "/education",
+    passport.authenticate("jwt", {
+      session: false
+    }),
+    addEducation
+  );
 
   function addEducation(req, res) {
-    const {
-      errors,
-      isValid
-    } = validateEducationInput(req.body);
+    const {errors, isValid} = validateEducationInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
@@ -338,7 +364,16 @@ module.exports = function (passport) {
       // Add to experience array
       // req.body keys = title, company, location, from, to, current, description
       profile.education.unshift(
-        _.pick(req.body, "school", "degree", "fieldOfStudy", "from", "to", "current", "description")
+        _.pick(
+          req.body,
+          "school",
+          "degree",
+          "fieldOfStudy",
+          "from",
+          "to",
+          "current",
+          "description"
+        )
       );
       profile.save().then(profile => res.json(profile));
     });
@@ -358,8 +393,8 @@ module.exports = function (passport) {
       const errors = {};
 
       Profile.findOne({
-          user: req.user.id
-        })
+        user: req.user.id
+      })
         .then(profile => {
           let matchingEducation = !_.find(profile.education, education => {
             return education._id.equals(ObjectId(req.params.edu_id));

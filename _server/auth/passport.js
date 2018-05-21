@@ -1,11 +1,11 @@
 "use strict";
 
-const config = require(`../config`).server;
+const config = require(`../../config`).server;
 const _ = require("underscore");
 
 // load up the user model
 let User;
-require("../lib/databaseConnections").then(dbs => {
+require("../dbs/databaseConnections").then(dbs => {
   User = dbs.mongo.model("User");
 });
 
@@ -42,7 +42,7 @@ module.exports = function(passport) {
     }
 
     // if they aren't save intended page then redirect them to the home page
-    res.cookie("cdp", req.originalUrl, { maxAge: 3600000 }); // Set Cookie
+    res.cookie("cdp", req.originalUrl, {maxAge: 3600000}); // Set Cookie
     res.redirect("/");
   };
 

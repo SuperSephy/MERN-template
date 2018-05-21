@@ -2,11 +2,11 @@
   "name": "@impact-marketing-specialists/devconnector",
   "version": "1.0.0",
   "description": "Social network for developers",
-  "main": "server.js",
+  "main": "_server/index.js",
   "scripts": {
     "client-install": "npm install --prefix _client",
-    "start": "node server",
-    "server": "nodemon server",
+    "start": "node _server/index.js",
+    "server": "nodemon _server/index.js",
     "client": "npm start --prefix _client",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },

@@ -1,4 +1,4 @@
-const config = require(`../config`).server;
+const config = require(`../../config`).server;
 const _ = require("underscore");
 
 // load all the things we need
@@ -7,7 +7,7 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 // load up the user model
 let User;
-require("../lib/databaseConnections").then(dbs => {
+require("../dbs/databaseConnections").then(dbs => {
   User = dbs.mongo.model("User");
 });
 
