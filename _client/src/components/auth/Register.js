@@ -26,6 +26,12 @@ class Register extends Component {
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      log("Register.js:", "User already logged in - redirecting to dashboard");
+      this.props.history.push("/dashboard");
+    }
+  }
 
   // Lifecycle Method - runs when component receives new properties
   componentWillReceiveProps(nextProps) {
@@ -140,8 +146,8 @@ class Register extends Component {
 // Enforce type casting, requirements, etc
 // ComponentName.propTypes
 Register.propTypes = {
-  errors: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
   registerUser: PropTypes.func.isRequired
 };
 

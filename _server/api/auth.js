@@ -110,9 +110,14 @@ module.exports = function(passport) {
             token,
             config.secret,
             {
-              expiresIn: env === "local" ? null : "1d"
+              expiresIn: "1d"
             },
             (err, token) => {
+              if (err || !token) {
+                errors.user = err;
+                return res.status(500).json(errors || "Unable to create auth token");
+              }
+
               res.json({
                 status: "ok",
                 token: `Bearer ${token}`
