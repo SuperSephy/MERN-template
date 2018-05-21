@@ -12,11 +12,13 @@ import setAuthToken from "./lib/setAuthToken";
 import { setCurrentUser, logOutUser } from "./actions/authActions";
 
 // Bring in Components
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
-import Landing from "./components/layout/Landing";
-import Register from "./components/auth/Register";
-import Login from "./components/auth/Login";
+import Navbar from "./components/elements/Navbar";
+import Footer from "./components/elements/Footer";
+import Landing from "./components/elements/Landing";
+
+// Bring in Pages
+import Register from "./components/pages/auth/Register";
+import Login from "./components/pages/auth/Login";
 
 // Bring in Resources
 import "./App.css";
@@ -40,7 +42,7 @@ if (localStorage.imsToken) {
     // TODO: Clear current profile
 
     // Redirect to login
-    window.location.href = '/login';
+    window.location.href = "/login";
   }
 }
 
