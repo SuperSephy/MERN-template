@@ -18,28 +18,49 @@ import PropTypes from "prop-types";
 
 const TextFieldGroup = ({
   name,
-  placeholder,
-  value,
   label,
+  type,
+  value,
+  placeholder,
+  icon,
   error,
   info,
-  type,
   onChange,
   disabled
 }) => {
-  return (
+  const textInput = (
+    <input
+      type={type}
+      className={classnames("form-control form-control-lg", {
+        "is-invalid": error
+      })}
+      placeholder={placeholder}
+      name={name}
+      value={value}
+      onChange={onChange}
+      disabled={disabled}
+    />
+  );
+
+  return icon ? (
     <div className="form-group">
-      <input
-        type={type}
-        className={classnames("form-control form-control-lg", {
-          "is-invalid": error
-        })}
-        placeholder={placeholder}
-        name={name}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-      />
+      <div className="input-group mb-3">
+        <div className="input-group-prepend">
+          <span className="input-group-text">
+            <i className={icon} />
+          </span>
+        </div>
+
+        {textInput}
+
+        {info && <small className="form-text text-muted">{info}</small>}
+        {error && <div className="invalid-feedback">{error}</div>}
+      </div>
+    </div>
+  ) : (
+    <div className="form-group">
+      {textInput}
+
       {info && <small className="form-text text-muted">{info}</small>}
       {error && <div className="invalid-feedback">{error}</div>}
     </div>
@@ -52,6 +73,7 @@ TextFieldGroup.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  icon: PropTypes.string,
   info: PropTypes.string,
   error: PropTypes.string,
   disabled: PropTypes.string
