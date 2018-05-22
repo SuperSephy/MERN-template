@@ -1,15 +1,16 @@
 // React Base Libraries
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import React, {Component} from "react";
+import {BrowserRouter as Router, Route} from "react-router-dom";
 
 // Redux Base Libraries
-import { Provider } from "react-redux"; // Store that will hold the state
+import {Provider} from "react-redux"; // Store that will hold the state
 import store from "./store"; // Imports Store => Reducers
 
 // Authentication handling
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./lib/setAuthToken";
-import { setCurrentUser, logOutUser } from "./actions/authActions";
+import {setCurrentUser, logOutUser} from "./actions/authActions";
+import {clearCurrentProfile} from "./actions/profileActions";
 
 // Bring in Components
 import Navbar from "./components/elements/Navbar";
@@ -19,6 +20,7 @@ import Landing from "./components/elements/Landing";
 // Bring in Pages
 import Register from "./components/pages/auth/Register";
 import Login from "./components/pages/auth/Login";
+import Dashboard from "./components/pages/dashboard/Dashboard";
 
 // Bring in Resources
 import "./App.css";
@@ -39,7 +41,8 @@ if (localStorage.imsToken) {
   if (decodedUser.exp < currentTime) {
     store.dispatch(logOutUser());
 
-    // TODO: Clear current profile
+    // Clear current profile
+    store.dispatch(clearCurrentProfile());
 
     // Redirect to login
     window.location.href = "/login";
@@ -59,6 +62,7 @@ class App extends Component {
             <div className="container">
               <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} />
+              <Route exact path="/dashboard" component={Dashboard} />
             </div>
 
             <Footer />

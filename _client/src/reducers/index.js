@@ -1,4 +1,4 @@
-import { combineReducers } from "redux";
+import {combineReducers} from "redux";
 
 /**
  * Reducers
@@ -10,9 +10,11 @@ import { combineReducers } from "redux";
 // Import reducers
 import errorReducer from "./errorReducer";
 import authReducer from "./authReducer";
+import profileReducer from "./profileReducer";
 
 // Combine Reducers
 export default combineReducers({
   errors: errorReducer,
-  auth: authReducer
+  auth: authReducer,
+  profile: profileReducer
 });
