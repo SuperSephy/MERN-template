@@ -1,7 +1,7 @@
 import axios from "axios"; // HTTP request module
 
 // Import Types to define, control, and limit available cases
-import {GET_PROFILE, PROFILE_LOADING, CLEAR_CURRENT_PROFILE, GET_ERRORS} from "./types";
+import { GET_PROFILE, PROFILE_LOADING, CLEAR_CURRENT_PROFILE } from "./types";
 
 // Get current profile
 export const getCurrentProfile = () => dispatch => {
