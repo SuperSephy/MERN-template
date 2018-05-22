@@ -1,18 +1,19 @@
 // React Base Libraries
-import React, {Component} from "react";
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 // Redux Base Libraries
-import {Provider} from "react-redux"; // Store that will hold the state
+import { Provider } from "react-redux"; // Store that will hold the state
 import store from "./store"; // Imports Store => Reducers
 
 // Authentication handling
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./lib/setAuthToken";
-import {setCurrentUser, logOutUser} from "./actions/authActions";
-import {clearCurrentProfile} from "./actions/profileActions";
+import { setCurrentUser, logOutUser } from "./actions/authActions";
+import { clearCurrentProfile } from "./actions/profileActions";
 
 // Bring in Components
+import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/elements/Navbar";
 import Footer from "./components/elements/Footer";
 import Landing from "./components/elements/Landing";
@@ -60,9 +61,13 @@ class App extends Component {
             <Route exact path="/" component={Landing} />
 
             <div className="container">
-              <Route exact path="/register" component={Register} />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/dashboard" component={Dashboard} />
+              <Switch>
+                <Route exact path="/register" component={Register} />
+                <Route exact path="/login" component={Login} />
+
+                {/* Private Routes need to be wrapped in */}
+                <PrivateRoute exact path="/dashboard" component={Dashboard} />
+              </Switch>
             </div>
 
             <Footer />
