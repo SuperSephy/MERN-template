@@ -46,5 +46,5 @@ process.once("SIGTERM", graceful_shutdown);
 
 function graceful_shutdown(sig) {
   console.log(`App terminated by ${sig}`);
-  process.exit(0);
+  // process.exit(0);
 }

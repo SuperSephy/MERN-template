@@ -11,7 +11,9 @@ import PropTypes from "prop-types"; // Runtime type checking for React props and
 import { getCurrentProfile, deleteAccount } from "../../../actions/profileActions";
 
 // Elements
-import ProfileParts from "./ProfileParts";
+import Education from "./Education";
+import Experience from "./Experience";
+import ProfileButtons from "./ProfileButtons";
 import Spinner from "../../elements/common/Spinner";
 
 class Dashboard extends Component {
@@ -39,9 +41,10 @@ class Dashboard extends Component {
             <p className="lead text-muted">
               Welcome <Link to={`/profile/${profile.handle}`}>{user.name}</Link>
             </p>
-            <ProfileParts />
+            <ProfileButtons />
 
-            {/* TODO: Experience and Education */}
+            <Experience experience={profile.experience} />
+            <Education education={profile.education} />
 
             <div style={{ marginBottom: "60px" }} />
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const ProfileParts = () => {
+const ProfileButtons = () => {
   return (
     <div className="btn-group mb-4" role="group">
       <Link to="/edit-profile" className="btn btn-light">
@@ -10,11 +10,11 @@ const ProfileParts = () => {
       </Link>
 
       <Link to="/add-experience" className="btn btn-light">
-        <i className="fas fa-black-tie text-info mr-1" />
+        <i className="fab fa-black-tie text-info mr-1" />
         Add Experience
       </Link>
 
-      <Link to="ad-education" className="btn btn-light">
+      <Link to="add-education" className="btn btn-light">
         <i className="fas fa-graduation-cap text-info mr-1" />
         Add Education
       </Link>
@@ -22,4 +22,4 @@ const ProfileParts = () => {
   );
 };
 
-export default ProfileParts;
+export default ProfileButtons;

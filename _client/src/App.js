@@ -9,22 +9,22 @@ import store from "./store"; // Imports Store => Reducers
 // Authentication handling
 import jwt_decode from "jwt-decode";
 import setAuthToken from "./lib/setAuthToken";
-import { setCurrentUser, logOutUser } from "./actions/authActions";
 import { clearCurrentProfile } from "./actions/profileActions";
+import { setCurrentUser, logOutUser } from "./actions/authActions";
 
 // Bring in Components
-import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/elements/Navbar";
 import Footer from "./components/elements/Footer";
 import Landing from "./components/elements/Landing";
+import PrivateRoute from "./components/PrivateRoute";
 
 // Bring in Pages
-import Register from "./components/pages/auth/Register";
 import Login from "./components/pages/auth/Login";
+import Register from "./components/pages/auth/Register";
 import Dashboard from "./components/pages/dashboard/Dashboard";
+
 import CreateProfile from "./components/pages/profile/CreateProfile";
 import EditProfile from "./components/pages/profile/EditProfile";
-
 import AddEducation from "./components/pages/profile/AddEducation";
 import AddExperience from "./components/pages/profile/AddExperience";
 
