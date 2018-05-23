@@ -1,13 +1,18 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 
 // Redux
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+// Actions
+import { getCurrentProfile, createProfile } from "../../../actions/profileActions";
+
 // Custom Elements
 import TextAreaGroup from "../../elements/common/TextAreaInput";
 import TextFieldGroup from "../../elements/common/TextFieldInput";
 import SelectListGroup from "../../elements/common/SelectListGroup";
+import isEmpty from "../../../validation/_isEmpty";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -35,9 +40,61 @@ class CreateProfile extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentDidMount() {
+    this.props.getCurrentProfile();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
+
+    if (nextProps.profile.profile) {
+      const profile = nextProps.profile.profile;
+
+      // Bring skills array back to CSV
+      profile.social = !isEmpty(profile.social) ? profile.social : {};
+
+      // Set component fields state
+      // If profile field doesn't exist, make empty string
+      this.setState({
+        handle: !isEmpty(profile.handle) ? profile.handle : "",
+        company: !isEmpty(profile.company) ? profile.company : "",
+        website: !isEmpty(profile.website) ? profile.website : "",
+        location: !isEmpty(profile.location) ? profile.location : "",
+        status: !isEmpty(profile.status) ? profile.status : "",
+        skills: !isEmpty(profile.skills) ? profile.skills.join(",") : "",
+        githubUsername: !isEmpty(profile.githubUsername) ? profile.githubUsername : "",
+        bio: !isEmpty(profile.bio) ? profile.bio : "",
+        twitter: !isEmpty(profile.social.twitter) ? profile.social.twitter : "",
+        facebook: !isEmpty(profile.social.facebook) ? profile.social.facebook : "",
+        linkedIn: !isEmpty(profile.social.linkedIn) ? profile.social.linkedIn : "",
+        youTube: !isEmpty(profile.social.youTube) ? profile.social.youTube : "",
+        instagram: !isEmpty(profile.social.instagram) ? profile.social.instagram : ""
+      });
+    }
+  }
+
   onSubmit(e) {
     e.preventDefault();
-    console.log("submit");
+
+    const profileData = {
+      handle: this.state.handle,
+      company: this.state.company,
+      website: this.state.website,
+      location: this.state.location,
+      status: this.state.status,
+      skills: this.state.skills,
+      githubUsername: this.state.githubUsername,
+      bio: this.state.bio,
+      twitter: this.state.twitter,
+      facebook: this.state.facebook,
+      linkedIn: this.state.linkedIn,
+      youTube: this.state.youTube,
+      instagram: this.state.instagram
+    };
+
+    this.props.createProfile(profileData, this.props.history);
   }
 
   onChange(e) {
@@ -123,11 +180,7 @@ class CreateProfile extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
-              <h1 className="display-5 text-center">Create Your Profile</h1>
-
-              <p className="lead text-center">
-                Let's get some information to make your profile stand out
-              </p>
+              <h1 className="display-5 text-center">Edit Profile</h1>
 
               <small className="d-block pb-3">* = required fields</small>
 
@@ -146,7 +199,7 @@ class CreateProfile extends Component {
                 <SelectListGroup
                   placeholder="Status"
                   name="status"
-                  value={this.state.handle}
+                  value={this.state.status}
                   onChange={this.onChange}
                   options={statusOptions}
                   error={errors.status}
@@ -215,6 +268,7 @@ class CreateProfile extends Component {
 
                 <div className="mb-3">
                   <button
+                    type="button"
                     className="btn btn-light"
                     onClick={() => {
                       this.setState(prevState => ({
@@ -240,8 +294,10 @@ class CreateProfile extends Component {
 }
 
 CreateProfile.propTypes = {
+  errors: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired
+  createProfile: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -249,4 +305,6 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps)(CreateProfile);
+export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
+  withRouter(CreateProfile)
+);

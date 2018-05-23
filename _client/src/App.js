@@ -22,7 +22,11 @@ import Landing from "./components/elements/Landing";
 import Register from "./components/pages/auth/Register";
 import Login from "./components/pages/auth/Login";
 import Dashboard from "./components/pages/dashboard/Dashboard";
-import CreateProfile from "./components/pages/create-profile/CreateProfile";
+import CreateProfile from "./components/pages/profile/CreateProfile";
+import EditProfile from "./components/pages/profile/EditProfile";
+
+import AddEducation from "./components/pages/profile/AddEducation";
+import AddExperience from "./components/pages/profile/AddExperience";
 
 // Bring in Resources
 import "./App.css";
@@ -69,6 +73,9 @@ class App extends Component {
                 {/* Private Routes need to be wrapped in - CUSTOM COMPONENT */}
                 <PrivateRoute exact path="/dashboard" component={Dashboard} />
                 <PrivateRoute exact path="/create-profile" component={CreateProfile} />
+                <PrivateRoute exact path="/edit-profile" component={EditProfile} />
+                <PrivateRoute exact path="/add-experience" component={AddExperience} />
+                <PrivateRoute exact path="/add-education" component={AddEducation} />
               </Switch>
             </div>
 

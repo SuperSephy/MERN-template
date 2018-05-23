@@ -16,7 +16,7 @@ const app = express();
 app.use(passport.initialize());
 require("./auth/passport")(passport); // Authentication
 
-app.use(bodyParser.urlencoded({extended: false})); // req.body URL Encoded
+app.use(bodyParser.urlencoded({ extended: false })); // req.body URL Encoded
 app.use(bodyParser.json()); // req.body JSON
 require("./dbs/databaseConnections"); // Database Connections
 
@@ -25,7 +25,7 @@ require("./dbs/databaseConnections"); // Database Connections
  */
 app.get("/", (req, res) => res.send("Hello World"));
 
-var apis = glob("**/*.js", {cwd: "_server/api"});
+var apis = glob("**/*.js", { cwd: "_server/api" });
 apis.forEach(api => {
   console.log("\nLoading", api.replace(/.js$/, ""));
   app.use("/api/" + api.replace(/.js$/, ""), require(`./api/${api}`)(passport));

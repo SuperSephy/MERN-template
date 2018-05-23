@@ -58,7 +58,7 @@ module.exports = function(passport) {
         session: false
       }),
       (req, res) => {
-        const {errors, isValid} = validateProfileInput(req.body);
+        const { errors, isValid } = validateProfileInput(req.body);
 
         // Check Validation
         if (!isValid) return res.status(400).json(errors);
@@ -274,7 +274,7 @@ module.exports = function(passport) {
   );
 
   function addExperience(req, res) {
-    const {errors, isValid} = validateExperienceInput(req.body);
+    const { errors, isValid } = validateExperienceInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
@@ -353,7 +353,7 @@ module.exports = function(passport) {
   );
 
   function addEducation(req, res) {
-    const {errors, isValid} = validateEducationInput(req.body);
+    const { errors, isValid } = validateEducationInput(req.body);
 
     // Check Validation
     if (!isValid) return res.status(400).json(errors);
