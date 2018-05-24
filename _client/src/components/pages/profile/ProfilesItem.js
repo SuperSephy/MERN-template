@@ -7,15 +7,6 @@ class ProfileItem extends Component {
   render() {
     const { profile } = this.props;
 
-    console.log(
-      profile.skills.slice(0, 4).map((skill, index) => {
-        <li key={index} className="list-group-item">
-          <i className="fa fa-check pr-1" />
-          {skill}
-        </li>;
-      })
-    );
-
     return (
       <div className="card card-body bg-light mb-3">
         <div className="row">

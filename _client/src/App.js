@@ -22,6 +22,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./components/pages/auth/Login";
 import Register from "./components/pages/auth/Register";
 import Dashboard from "./components/pages/dashboard/Dashboard";
+import Profile from "./components/pages/profile/Profile";
 import Profiles from "./components/pages/profile/Profiles";
 
 import CreateProfile from "./components/pages/profile/CreateProfile";
@@ -72,6 +73,7 @@ class App extends Component {
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/register" component={Register} />
                 <Route exact path="/profiles" component={Profiles} />
+                <Route exact path="/profile/:handle" component={Profile} />
 
                 {/* Private Routes need to be wrapped in - CUSTOM COMPONENT */}
                 <PrivateRoute exact path="/dashboard" component={Dashboard} />

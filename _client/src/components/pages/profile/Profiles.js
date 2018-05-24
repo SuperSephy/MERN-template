@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { getProfiles } from "../../../actions/profileActions";
 
 // Resources
-import ProfileItem from "./ProfileItem";
+import ProfilesItem from "./ProfilesItem";
 import Spinner from "../../elements/common/Spinner";
 
 class Profiles extends Component {
@@ -25,7 +25,7 @@ class Profiles extends Component {
     } else {
       if (profiles.length) {
         profileItems = profiles.map(profile => (
-          <ProfileItem key={profile._id} profile={profile} />
+          <ProfilesItem key={profile._id} profile={profile} />
         ));
       } else {
         profileItems = <h4>No profiles found...</h4>;

@@ -209,6 +209,7 @@ module.exports = function(passport) {
     Profile.findOne({
       handle: req.params.handle
     })
+      .populate("user", ["name", "avatar"]) // Get referenced data
       .then(profile => {
         const errors = {};
 
@@ -235,6 +236,7 @@ module.exports = function(passport) {
 
   router.get("/user/:user_id", (req, res) => {
     Profile.findById(req.params.user_id)
+      .populate("user", ["name", "avatar"]) // Get referenced data
       .then(profile => {
         const errors = {};
 
