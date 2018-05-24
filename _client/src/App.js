@@ -17,6 +17,7 @@ import Navbar from "./components/elements/Navbar";
 import Footer from "./components/elements/Footer";
 import Landing from "./components/elements/Landing";
 import PrivateRoute from "./components/PrivateRoute";
+import NotFound from "./components/pages/NotFound";
 
 // Bring in Pages
 import Login from "./components/pages/auth/Login";
@@ -82,6 +83,9 @@ class App extends Component {
                 <PrivateRoute exact path="/add-experience" component={AddExperience} />
                 <PrivateRoute exact path="/add-education" component={AddEducation} />
               </Switch>
+
+              {/* Error Handling */}
+              <Route exact path="/notFound" component={NotFound} />
             </div>
 
             <Footer />
