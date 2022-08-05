@@ -21,7 +21,7 @@
     "glob": "^7.1.2",
     "gravatar": "^1.6.0",
     "jsonwebtoken": "^8.2.1",
-    "mongoose": "^5.0.17",
+    "mongoose": "^5.7.5",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "underscore": "^1.9.0",
